@@ -647,6 +647,146 @@ html, body {
   }
 }
 
+
+
+/* ============================================================
+   CHAPTER HEADER + MOBILE-ONLY OVERLAY VIEW
+   Desktop: chapters stay below subject cards with arrow pointer.
+   Mobile: chapters open as a focused overlay with Close button.
+   ============================================================ */
+.chapter-overlay-header {
+  display: block;
+  padding: 0 0 1rem;
+}
+
+.chapter-overlay-header h3 {
+  margin: 0;
+  text-align: center;
+}
+
+/* Close button is hidden on desktop so desktop keeps the older layout. */
+.chapter-close-btn {
+  display: none;
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 999px;
+  padding: .7rem 1rem;
+  font-family: var(--font-title);
+  font-size: .9rem;
+  cursor: pointer;
+  color: inherit;
+  background: rgba(255,255,255,.72);
+  box-shadow: 6px 6px 16px rgba(80,40,120,.12), -6px -6px 16px rgba(255,255,255,.65);
+  transition: transform .2s, box-shadow .2s, background .2s;
+}
+
+.chapter-close-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,.9);
+  box-shadow: 0 12px 24px rgba(80,40,120,.16);
+}
+
+.chapter-close-btn:active {
+  transform: scale(.96);
+}
+
+.selected-chapters-area.active .chapter-list.open {
+  padding-bottom: .35rem;
+}
+
+/* Mobile / tablet only: subject cards hide and chapters appear as overlay. */
+@media (max-width: 720px) {
+  #dashboard-page.chapter-mode .panels-wrap {
+    transform: scale(.96);
+    opacity: 0;
+    pointer-events: none;
+    filter: blur(8px);
+  }
+
+  .selected-chapters-area.active {
+    position: fixed;
+    inset: 82px 10px 12px;
+    width: auto;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: .9rem;
+    z-index: 9998;
+    overflow-y: auto;
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,.75);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 26px 70px rgba(80,40,120,.24), inset 8px 8px 24px rgba(0,0,0,.06), inset -8px -8px 24px rgba(255,255,255,.7);
+  }
+
+  .selected-chapters-area.active::before {
+    display: none;
+  }
+
+  .chapter-overlay-header {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .85rem;
+    padding: .2rem .1rem .8rem;
+    background: linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,0));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .chapter-overlay-header h3 {
+    margin: 0;
+    text-align: left;
+    font-size: 1.28rem;
+    line-height: 1.15;
+  }
+
+  .chapter-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .58rem .78rem;
+    font-size: .78rem;
+  }
+
+  .selected-chapters-area.active .chapter-list.open {
+    max-height: none;
+    grid-template-columns: 1fr;
+    gap: .85rem;
+  }
+
+  .selected-chapters-area.active .chapter-item {
+    min-height: 88px;
+    border-radius: 22px;
+    padding: .85rem .9rem;
+    font-size: .84rem;
+  }
+
+  .dash-header {
+    padding: 1.25rem .75rem .75rem;
+  }
+
+  .dash-header h2 {
+    font-size: clamp(1.65rem, 7vw, 2.4rem);
+  }
+
+  .dash-header p {
+    font-size: .85rem;
+  }
+
+  #cracker-btn {
+    width: 54px;
+    height: 54px;
+    font-size: 1.8rem;
+    bottom: 1.05rem;
+    right: 1.05rem;
+  }
+}
+
+
 /* ============================================================
    FIREWORK / CRACKER BURST SYSTEM
    ============================================================ */
@@ -1086,7 +1226,7 @@ html, body {
 <div class="panel-sub">History · Civics · Maps</div>
 
 </div>
-</div><div class="selected-chapters-area" id="selected-chapters-area"><h3 id="selected-chapters-title">Choose a subject to view chapters</h3><div class="chapter-list chapters-english-theme" id="chapters-english">
+</div><div class="selected-chapters-area" id="selected-chapters-area"><div class="chapter-overlay-header"><h3 id="selected-chapters-title">Choose a subject to view chapters</h3><button class="chapter-close-btn" id="chapter-close-btn" type="button">Close ✕</button></div><div class="chapter-list chapters-english-theme" id="chapters-english">
 <!-- Replace each href below with the actual chapter HTML file path in your GitHub repo. -->
 <a class="chapter-item" href="English/a-bottle-of-dew.html">Chapter 1: A Bottle of Dew</a>
 <a class="chapter-item" href="English/the-raven-and-the-fox.html">Chapter 2: The Raven and the Fox</a>
@@ -1106,7 +1246,7 @@ html, body {
 <a class="chapter-item" href="English/national-war-memorial.html">Chapter 16: National War Memorial</a>
 </div><div class="chapter-list chapters-science-theme" id="chapters-science">
 <!-- Replace each href below with the actual chapter HTML file path in your GitHub repo. -->
-<a class="chapter-item" href="science/class_6_science_wonderful_world_integrated_html.html">Chapter 1: The Wonderful World of Science</a>
+<a class="chapter-item" href="Science/the-wonderful-world-of-science.html">Chapter 1: The Wonderful World of Science</a>
 <a class="chapter-item" href="Science/diversity-in-the-living-world.html">Chapter 2: Diversity in the Living World</a>
 <a class="chapter-item" href="Science/mindful-eating-a-path-to-a-healthy-body.html">Chapter 3: Mindful Eating: A Path to a Healthy Body</a>
 <a class="chapter-item" href="Science/exploring-magnets.html">Chapter 4: Exploring Magnets</a>
@@ -1168,6 +1308,7 @@ enterBtn.addEventListener('click', () => {
 
 backBtn.addEventListener('click', () => {
   dashboardPage.style.display = 'none';
+  dashboardPage.classList.remove('chapter-mode');
   landingPage.style.display   = 'block';
   landingPage.style.animation = 'portalOpen .9s cubic-bezier(.22,1,.36,1) both';
 });
@@ -1177,6 +1318,7 @@ const panels = document.querySelectorAll('.subject-panel');
 const panelsWrap = document.querySelector('.panels-wrap');
 const selectedChaptersArea = document.getElementById('selected-chapters-area');
 const selectedChaptersTitle = document.getElementById('selected-chapters-title');
+const chapterCloseBtn = document.getElementById('chapter-close-btn');
 let activeSubjectId = null;
 
 const subjectTitles = {
@@ -1201,6 +1343,7 @@ function openSubjectChapters(panel) {
 
   activeSubjectId = id;
   panelsWrap.classList.add('has-selection');
+  dashboardPage.classList.add('chapter-mode');
   selectedChaptersArea.classList.remove('english-theme', 'science-theme', 'math-theme', 'social-theme');
   selectedChaptersArea.classList.add('active', id + '-theme');
   selectedChaptersTitle.textContent = subjectTitles[id] || 'Chapters';
@@ -1211,6 +1354,7 @@ function openSubjectChapters(panel) {
   panel.classList.add('selected-panel');
   list.classList.add('open');
 
+  selectedChaptersArea.scrollTop = 0;
   requestAnimationFrame(() => updateChapterArrow(panel));
 
   // Re-trigger animations on chapter cards
@@ -1222,8 +1366,28 @@ function openSubjectChapters(panel) {
   });
 }
 
+function closeSubjectChapters() {
+  activeSubjectId = null;
+  dashboardPage.classList.remove('chapter-mode');
+  panelsWrap.classList.remove('has-selection');
+  selectedChaptersArea.classList.remove('active', 'english-theme', 'science-theme', 'math-theme', 'social-theme');
+  document.querySelectorAll('.chapter-list').forEach(l => l.classList.remove('open'));
+  document.querySelectorAll('.subject-panel').forEach(p => p.classList.remove('selected-panel'));
+}
+
 panels.forEach(panel => {
   panel.addEventListener('click', () => openSubjectChapters(panel));
+});
+
+if (chapterCloseBtn) {
+  chapterCloseBtn.addEventListener('click', event => {
+    event.stopPropagation();
+    closeSubjectChapters();
+  });
+}
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && activeSubjectId) closeSubjectChapters();
 });
 
 window.addEventListener('resize', () => {
