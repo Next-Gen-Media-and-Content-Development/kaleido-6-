@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>KALEIDO-6 ✨ Magical Digital Book</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&amp;family=Nunito:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <style>
 /* ============================================================
    CSS VARIABLES & RESET
@@ -367,11 +368,13 @@ html, body {
 .panels-wrap {
   display: flex;
   gap: 1.4rem;
-  padding: 1.5rem 2rem 3rem;
+  padding: 1.5rem 2rem 1.2rem;
   justify-content: center;
+  align-items: flex-start;
   flex-wrap: wrap;
   position: relative;
   z-index: 5;
+  transition: gap .35s ease, padding .35s ease;
 }
 
 .subject-panel {
@@ -381,14 +384,53 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   padding: 2rem 1rem 1.5rem;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  transition: width .4s cubic-bezier(.34,1.56,.64,1), min-height .4s cubic-bezier(.34,1.56,.64,1), padding .35s ease, transform .3s cubic-bezier(.34,1.56,.64,1), border-radius .35s ease, background .35s ease, box-shadow .35s ease, opacity .35s ease;
   animation: panelPop .7s cubic-bezier(.34,1.56,.64,1) both;
   user-select: none;
 }
+
+/* After a subject is selected, all subject cards shrink in height */
+.panels-wrap.has-selection {
+  gap: 1.1rem;
+  padding-bottom: 1.4rem;
+}
+
+.panels-wrap.has-selection .subject-panel {
+  width: 215px;
+  min-height: 165px;
+  padding: 1.05rem .9rem 1rem;
+  border-radius: 28px;
+  justify-content: center;
+  transform: scale(.94);
+  opacity: .82;
+}
+
+.panels-wrap.has-selection .subject-panel.selected-panel {
+  transform: translateY(-5px) scale(1);
+  opacity: 1;
+  outline: 4px solid rgba(255,255,255,.72);
+  outline-offset: 3px;
+}
+
+.panels-wrap.has-selection .panel-icon {
+  font-size: 2.35rem;
+  margin-bottom: .45rem;
+}
+
+.panels-wrap.has-selection .panel-title {
+  font-size: 1.25rem;
+  margin-bottom: .25rem;
+}
+
+.panels-wrap.has-selection .panel-sub {
+  font-size: .72rem;
+}
+
 .subject-panel:nth-child(1) { animation-delay: .1s; }
 .subject-panel:nth-child(2) { animation-delay: .2s; }
 .subject-panel:nth-child(3) { animation-delay: .3s; }
@@ -422,9 +464,9 @@ html, body {
 }
 
 .subject-panel:hover { transform: translateY(-8px) scale(1.03); }
-.subject-panel:active {
-  transform: scale(.95);
-}
+.panels-wrap.has-selection .subject-panel:hover { transform: translateY(-4px) scale(.98); }
+.panels-wrap.has-selection .subject-panel.selected-panel:hover { transform: translateY(-7px) scale(1.02); }
+.subject-panel:active { transform: scale(.95); }
 .subject-panel:active.panel-english { box-shadow: inset 14px 14px 40px #e8a0bc, inset -14px -14px 40px #fff0f7; }
 .subject-panel:active.panel-science { box-shadow: inset 14px 14px 40px #8fd98f, inset -14px -14px 40px #efffef; }
 .subject-panel:active.panel-math    { box-shadow: inset 14px 14px 40px #88b8e0, inset -14px -14px 40px #eaf7ff; }
@@ -458,53 +500,152 @@ html, body {
   pointer-events: none;
 }
 
-/* ---- Chapter List (expandable) ---- */
+/* ---- Selected subject chapter section ---- */
+.selected-chapters-area {
+  --chapter-shell-bg: linear-gradient(135deg, rgba(255,255,255,.42), rgba(255,214,232,.72));
+  width: min(1120px, calc(100% - 3rem));
+  margin: .2rem auto 3rem;
+  padding: 1.35rem;
+  border-radius: 34px;
+  position: relative;
+  z-index: 4;
+  display: none;
+  background: var(--chapter-shell-bg);
+  box-shadow: inset 8px 8px 24px rgba(0,0,0,.08), inset -8px -8px 24px rgba(255,255,255,.65), 0 18px 45px rgba(130,80,150,.16);
+}
+
+.selected-chapters-area.active {
+  display: block;
+  animation: chapterAreaRise .45s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+/* Arrow showing chapters are a sub-part of the clicked subject */
+.selected-chapters-area.active::before {
+  content: '';
+  position: absolute;
+  top: -17px;
+  left: var(--arrow-left, 50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 8px 0 0 0;
+  transform: translateX(-50%) rotate(45deg);
+  background: var(--chapter-shell-bg);
+  box-shadow: -8px -8px 18px rgba(255,255,255,.4);
+}
+
+@keyframes chapterAreaRise {
+  from { opacity: 0; transform: translateY(18px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.selected-chapters-area h3 {
+  font-family: var(--font-title);
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.selected-chapters-area.english-theme { --chapter-shell-bg: linear-gradient(135deg, rgba(255,255,255,.46), rgba(255,214,232,.85)); color: #a0295c; }
+.selected-chapters-area.science-theme { --chapter-shell-bg: linear-gradient(135deg, rgba(255,255,255,.46), rgba(205,255,206,.88)); color: #1e7c1e; }
+.selected-chapters-area.math-theme    { --chapter-shell-bg: linear-gradient(135deg, rgba(255,255,255,.46), rgba(201,232,255,.9)); color: #1a5fa0; }
+.selected-chapters-area.social-theme  { --chapter-shell-bg: linear-gradient(135deg, rgba(255,255,255,.46), rgba(255,233,160,.92)); color: #8c5e00; }
+
+/* ---- Chapter Cards ---- */
 .chapter-list {
   width: 100%;
   max-height: 0;
   overflow: hidden;
-  transition: max-height .6s cubic-bezier(.34,1.56,.64,1);
-  margin-top: .8rem;
+  padding: 0;
+  border-radius: 28px;
 }
-.chapter-list.open { max-height: 900px; }
+
+.chapter-list.open {
+  max-height: 1500px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+  gap: .9rem;
+}
 
 .chapter-item {
-  background: rgba(255,255,255,.55);
-  border-radius: 20px;
-  padding: .5rem .8rem;
-  margin: .4rem 0;
-  font-size: .82rem;
-  font-weight: 700;
+  min-height: 96px;
+  background: rgba(255,255,255,.9);
+  border-radius: 24px;
+  padding: .9rem .95rem;
+  margin: 0;
+  font-size: .86rem;
+  font-weight: 800;
+  line-height: 1.25;
   text-align: left;
-  backdrop-filter: blur(4px);
-  animation: chapterPop .4s cubic-bezier(.34,1.56,.64,1) both;
+  backdrop-filter: blur(6px);
+  animation: chapterPop .45s cubic-bezier(.34,1.56,.64,1) both;
   cursor: pointer;
-  transition: transform .2s;
-  border: none;
+  transition: transform .2s, box-shadow .2s, background .2s;
+  border: 1px solid rgba(255,255,255,.72);
   width: 100%;
   color: inherit;
   text-decoration: none;
   display: flex;
-  align-items: center;
-  gap: .4rem;
+  align-items: flex-start;
+  gap: .55rem;
+  box-shadow: 0 10px 22px rgba(80,40,100,.12);
 }
-.chapter-item:hover { transform: scale(1.04); }
+
+.chapters-english-theme.open .chapter-item { background: #fff3f8; }
+.chapters-science-theme.open .chapter-item { background: #f3fff3; }
+.chapters-math-theme.open .chapter-item    { background: #f1f9ff; }
+.chapters-social-theme.open .chapter-item  { background: #fff9df; }
+
+.chapter-item:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 16px 28px rgba(80,40,100,.18);
+}
 .chapter-item:nth-child(1){ animation-delay:.05s;}
 .chapter-item:nth-child(2){ animation-delay:.1s;}
 .chapter-item:nth-child(3){ animation-delay:.15s;}
 .chapter-item:nth-child(4){ animation-delay:.2s;}
 .chapter-item:nth-child(5){ animation-delay:.25s;}
+.chapter-item:nth-child(6){ animation-delay:.3s;}
+.chapter-item:nth-child(7){ animation-delay:.35s;}
+.chapter-item:nth-child(8){ animation-delay:.4s;}
 @keyframes chapterPop {
-  from { opacity:0; transform:scale(.8) translateX(-10px); }
-  to   { opacity:1; transform:scale(1) translateX(0); }
+  from { opacity:0; transform:scale(.82) translateY(12px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
 }
 
-/* Tick icon for chapters */
-.chapter-item::before { content: '🍬'; font-size: .9rem; }
-.panel-english  .chapter-item::before { content: '📖'; }
-.panel-science  .chapter-item::before { content: '🔬'; }
-.panel-math     .chapter-item::before { content: '🔢'; }
-.panel-social   .chapter-item::before { content: '🌍'; }
+/* Subject-wise card icons */
+.chapter-item::before {
+  content: '🍬';
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,.75);
+  font-size: .95rem;
+  box-shadow: inset 2px 2px 7px rgba(0,0,0,.06);
+}
+.chapters-english-theme .chapter-item::before { content: '📖'; }
+.chapters-science-theme .chapter-item::before { content: '🔬'; }
+.chapters-math-theme .chapter-item::before    { content: '🔢'; }
+.chapters-social-theme .chapter-item::before  { content: '🌍'; }
+
+@media (max-width: 720px) {
+  .panels-wrap { padding: 1rem 1rem 1.2rem; }
+  .subject-panel,
+  .panels-wrap.has-selection .subject-panel {
+    width: min(100%, 360px);
+    min-height: 150px;
+  }
+  .selected-chapters-area {
+    width: calc(100% - 1.5rem);
+    padding: 1rem;
+  }
+  .chapter-list.open {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* ============================================================
    FIREWORK / CRACKER BURST SYSTEM
@@ -595,460 +736,418 @@ html, body {
 </style>
 </head>
 <body>
-
 <!-- ============================================================
      SVG SPARKLE DUST CANVAS (over both pages)
      ============================================================ -->
 <svg id="sparkle-canvas" xmlns="http://www.w3.org/2000/svg"></svg>
-
 <!-- Cracker / Firework Layer -->
 <div id="cracker-layer"></div>
 <!-- Cracker Launch Button -->
 <button id="cracker-btn" title="Launch Crackers!">🚀</button>
-
 <!-- ============================================================
      LANDING PAGE
      ============================================================ -->
 <div id="landing-page">
-
-  <!-- Background gradient -->
-  <div class="bg-gradient"></div>
-
-  <!-- Biscuit Mountains SVG -->
-  <svg class="mountains" viewBox="0 0 1440 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Far mountain (lightest, smallest) -->
-    <ellipse cx="720" cy="420" rx="900" ry="220" fill="#f5d5e8" opacity=".5"/>
-    <!-- Mid mountain -->
-    <path d="M0,380 Q180,180 360,260 Q540,340 720,200 Q900,60 1080,200 Q1260,340 1440,260 L1440,400 L0,400Z"
-          fill="#eec9dc" opacity=".65"/>
-    <!-- Biscuit crinkle detail -->
-    <path d="M0,370 Q120,330 240,355 Q360,380 480,345 Q600,310 720,340 Q840,370 960,340 Q1080,310 1200,345 Q1320,380 1440,355 L1440,400 L0,400Z"
-          fill="#f7d9e8" opacity=".8"/>
-    <!-- Front hill -->
-    <path d="M0,395 Q360,340 720,370 Q1080,400 1440,370 L1440,400 L0,400Z"
-          fill="#fce4f0" opacity="1"/>
-    <!-- Biscuit texture dots -->
-    <circle cx="350" cy="320" r="6" fill="#ffd6e8" opacity=".6"/>
-    <circle cx="700" cy="290" r="5" fill="#ffd6e8" opacity=".6"/>
-    <circle cx="1100" cy="305" r="7" fill="#ffd6e8" opacity=".6"/>
-  </svg>
-
-  <!-- Lollipop Trees SVG layer -->
-  <svg class="lollipop-layer" viewBox="0 0 1440 350" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Tree 1 - left -->
-    <rect x="68" y="240" width="10" height="80" rx="5" fill="#d4889a"/>
-    <circle cx="73" cy="210" r="42" fill="#FF8FAB" opacity=".85"/>
-    <circle cx="73" cy="210" r="30" fill="#FFB6C1" opacity=".7"/>
-    <circle cx="55" cy="200" r="7" fill="#fff" opacity=".5"/>
-    <!-- Spiral on lollipop -->
-    <circle cx="73" cy="210" r="15" fill="none" stroke="#ff6699" stroke-width="3" opacity=".5"/>
-
-    <!-- Tree 2 - left mid -->
-    <rect x="218" y="260" width="8" height="70" rx="4" fill="#aad4a0"/>
-    <circle cx="222" cy="232" r="34" fill="#BFFFA0" opacity=".85"/>
-    <circle cx="222" cy="232" r="22" fill="#d4ffbe" opacity=".6"/>
-    <circle cx="210" cy="224" r="5" fill="#fff" opacity=".5"/>
-
-    <!-- Tree 3 - right mid -->
-    <rect x="1198" y="255" width="9" height="75" rx="4" fill="#aab8d4"/>
-    <circle cx="1202" cy="222" r="38" fill="#B5D8F7" opacity=".85"/>
-    <circle cx="1202" cy="222" r="25" fill="#cce8ff" opacity=".6"/>
-    <circle cx="1188" cy="212" r="6" fill="#fff" opacity=".5"/>
-
-    <!-- Tree 4 - right -->
-    <rect x="1360" y="240" width="10" height="80" rx="5" fill="#d4c888"/>
-    <circle cx="1365" cy="208" r="40" fill="#FFD580" opacity=".85"/>
-    <circle cx="1365" cy="208" r="26" fill="#ffe9a0" opacity=".7"/>
-    <circle cx="1350" cy="198" r="6" fill="#fff" opacity=".5"/>
-
-    <!-- Small accent tree - far left -->
-    <rect x="140" y="270" width="6" height="55" rx="3" fill="#e0a8c8"/>
-    <circle cx="143" cy="248" r="26" fill="#E0C8FF" opacity=".8"/>
-
-    <!-- Small accent tree - far right -->
-    <rect x="1290" y="268" width="6" height="55" rx="3" fill="#c8d4e0"/>
-    <circle cx="1293" cy="246" r="25" fill="#B5D8F7" opacity=".8"/>
-  </svg>
-
-  <!-- Cotton Candy Clouds layer -->
-  <div class="cloud-layer" id="cloud-layer">
-    <!-- Cloud 1 -->
-    <div class="cloud cloud-1" data-depth="0.2">
-      <svg width="220" height="90" viewBox="0 0 220 90" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="110" cy="65" rx="100" ry="28" fill="#FFD6E8" opacity=".75"/>
-        <ellipse cx="70"  cy="52" rx="55"  ry="40" fill="#ffc2d9" opacity=".8"/>
-        <ellipse cx="130" cy="48" rx="60"  ry="45" fill="#FFD6E8" opacity=".8"/>
-        <ellipse cx="170" cy="55" rx="45"  ry="34" fill="#ffc2d9" opacity=".75"/>
-      </svg>
-    </div>
-    <!-- Cloud 2 (bigger) -->
-    <div class="cloud cloud-2" data-depth="0.35">
-      <svg width="290" height="110" viewBox="0 0 290 110" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="145" cy="82" rx="135" ry="30" fill="#d6eeff" opacity=".7"/>
-        <ellipse cx="90"  cy="65" rx="65"  ry="48" fill="#bddcff" opacity=".75"/>
-        <ellipse cx="165" cy="58" rx="75"  ry="56" fill="#d6eeff" opacity=".75"/>
-        <ellipse cx="225" cy="68" rx="58"  ry="42" fill="#bddcff" opacity=".7"/>
-      </svg>
-    </div>
-    <!-- Cloud 3 (small) -->
-    <div class="cloud cloud-3" data-depth="0.15">
-      <svg width="160" height="70" viewBox="0 0 160 70" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="80"  cy="52" rx="72"  ry="20" fill="#FFE4F2" opacity=".8"/>
-        <ellipse cx="52"  cy="40" rx="40"  ry="30" fill="#FFD6E8" opacity=".8"/>
-        <ellipse cx="100" cy="36" rx="45"  ry="34" fill="#FFE4F2" opacity=".8"/>
-        <ellipse cx="130" cy="44" rx="32"  ry="24" fill="#FFD6E8" opacity=".75"/>
-      </svg>
-    </div>
-    <!-- Cloud 4 -->
-    <div class="cloud cloud-4" data-depth="0.28">
-      <svg width="240" height="95" viewBox="0 0 240 95" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="120" cy="72" rx="110" ry="25" fill="#E0C8FF" opacity=".7"/>
-        <ellipse cx="80"  cy="58" rx="58"  ry="44" fill="#d4aaff" opacity=".75"/>
-        <ellipse cx="150" cy="52" rx="66"  ry="50" fill="#E0C8FF" opacity=".75"/>
-        <ellipse cx="200" cy="62" rx="50"  ry="36" fill="#d4aaff" opacity=".7"/>
-      </svg>
-    </div>
-  </div>
-
-  <!-- Hero Text -->
-  <div class="hero-text">
-    <h1>KALEIDO-6</h1>
-    <p>✨ Your Magical Digital World of Learning ✨</p>
-    <button class="enter-btn" id="enter-btn">Open the Portal 🌈</button>
-  </div>
-
-  <!-- SWEET CASTLE (SVG) -->
-  <div class="castle-wrap" id="castle-wrap">
-    <div class="castle-glow"></div>
-    <svg width="340" height="300" viewBox="0 0 340 300" xmlns="http://www.w3.org/2000/svg">
-      <!-- Castle base / body -->
-      <rect x="70" y="160" width="200" height="120" rx="14" fill="#FFB6C1"/>
-      <rect x="70" y="160" width="200" height="120" rx="14" fill="url(#cakeStripe)" opacity=".5"/>
-
-      <!-- Cake stripes on body -->
-      <defs>
-        <pattern id="cakeStripe" patternUnits="userSpaceOnUse" width="12" height="12" patternTransform="rotate(45)">
-          <rect width="6" height="12" fill="rgba(255,255,255,.25)"/>
-        </pattern>
-        <radialGradient id="towerGrad" cx="50%" cy="30%" r="60%">
-          <stop offset="0%" stop-color="#fff0f5"/>
-          <stop offset="100%" stop-color="#FFB6C1"/>
-        </radialGradient>
-        <radialGradient id="roofGrad" cx="50%" cy="0%" r="100%">
-          <stop offset="0%" stop-color="#FF6BB3"/>
-          <stop offset="100%" stop-color="#FF8FAB"/>
-        </radialGradient>
-        <filter id="castleGlow">
-          <feGaussianBlur stdDeviation="4" result="blur"/>
-          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-        </filter>
-      </defs>
-
-      <!-- Icing drip on body -->
-      <path d="M70,165 Q90,180 110,165 Q130,150 150,165 Q170,180 190,165 Q210,150 230,165 Q250,180 270,165 L270,175 Q250,195 230,180 Q210,165 190,180 Q170,195 150,180 Q130,165 110,180 Q90,195 70,180Z"
-            fill="white" opacity=".7"/>
-
-      <!-- Gate arch (door) -->
-      <path d="M150,280 L150,225 Q170,205 190,225 L190,280Z" fill="#FFD6E8"/>
-      <path d="M150,225 Q170,200 190,225" fill="none" stroke="#FF8FAB" stroke-width="3"/>
-      <!-- Gate candy-cane stripes -->
-      <path d="M153,245 L187,245" stroke="#FF6BB3" stroke-width="2.5" opacity=".5"/>
-      <path d="M153,258 L187,258" stroke="#FF6BB3" stroke-width="2.5" opacity=".5"/>
-
-      <!-- Windows -->
-      <rect x="90"  y="185" width="28" height="28" rx="14" fill="#ffe0f0"/>
-      <rect x="222" y="185" width="28" height="28" rx="14" fill="#ffe0f0"/>
-      <circle cx="104" cy="199" r="6" fill="#FF8FAB" opacity=".8"/>
-      <circle cx="236" cy="199" r="6" fill="#FF8FAB" opacity=".8"/>
-
-      <!-- Left tower -->
-      <rect x="55" y="130" width="55" height="90" rx="8" fill="url(#towerGrad)"/>
-      <!-- Left tower roof (cone) -->
-      <polygon points="82,75 35,130 130,130" fill="url(#roofGrad)"/>
-      <!-- Candy ball on left tower -->
-      <circle cx="82" cy="72" r="12" fill="#FFD580"/>
-      <circle cx="78" cy="68" r="4" fill="rgba(255,255,255,.5)"/>
-
-      <!-- Right tower -->
-      <rect x="230" y="130" width="55" height="90" rx="8" fill="url(#towerGrad)"/>
-      <!-- Right tower roof (cone) -->
-      <polygon points="257,75 210,130 305,130" fill="url(#roofGrad)"/>
-      <!-- Candy ball on right tower -->
-      <circle cx="257" cy="72" r="12" fill="#BFFFA0"/>
-      <circle cx="253" cy="68" r="4" fill="rgba(255,255,255,.5)"/>
-
-      <!-- Center tall tower -->
-      <rect x="135" y="100" width="70" height="100" rx="8" fill="url(#towerGrad)"/>
-      <!-- Center tower roof -->
-      <polygon points="170,38 118,100 222,100" fill="#FF6BB3"/>
-      <!-- Candy star on center tower -->
-      <text x="170" y="45" text-anchor="middle" font-size="22" fill="#FFD580">★</text>
-      <!-- Icing on center tower roof -->
-      <path d="M118,100 Q130,115 142,100 Q154,85 166,100 Q178,115 190,100 Q202,85 214,100 Q218,100 222,100" fill="white" opacity=".6"/>
-
-      <!-- Candy cane flag poles -->
-      <line x1="82"  y1="62" x2="82"  y2="40" stroke="#d4889a" stroke-width="2.5"/>
-      <polygon points="82,40 100,48 82,56" fill="#FF6BB3"/>
-      <line x1="257" y1="62" x2="257" y2="40" stroke="#aad4a0" stroke-width="2.5"/>
-      <polygon points="257,40 275,48 257,56" fill="#BFFFA0"/>
-
-      <!-- Macarons on base wall -->
-      <circle cx="100" cy="162" r="7" fill="#FFD580" stroke="#fff" stroke-width="1.5"/>
-      <circle cx="120" cy="162" r="7" fill="#FF8FAB" stroke="#fff" stroke-width="1.5"/>
-      <circle cx="220" cy="162" r="7" fill="#BFFFA0" stroke="#fff" stroke-width="1.5"/>
-      <circle cx="240" cy="162" r="7" fill="#E0C8FF" stroke="#fff" stroke-width="1.5"/>
-
-      <!-- Glow highlights on castle -->
-      <ellipse cx="170" cy="295" rx="130" ry="12" fill="rgba(255,150,200,.2)"/>
-    </svg>
-  </div>
-
-  <!-- Gummy Bears Layer -->
-  <div class="gummy-layer">
-    <!-- Gummy 1 (pink) -->
-    <div class="gummy gummy-1">
-      <svg width="54" height="70" viewBox="0 0 54 70" xmlns="http://www.w3.org/2000/svg">
-        <!-- Wings -->
-        <ellipse cx="7"  cy="25" rx="14" ry="9" fill="rgba(220,180,255,.65)" transform="rotate(-30 7 25)" class="wing"/>
-        <ellipse cx="47" cy="25" rx="14" ry="9" fill="rgba(220,180,255,.65)" transform="rotate(30 47 25)"  class="wing"/>
-        <!-- Body -->
-        <ellipse cx="27" cy="42" rx="16" ry="19" fill="#FF8FAB"/>
-        <!-- Head -->
-        <circle  cx="27" cy="22" r="15"           fill="#FF8FAB"/>
-        <!-- Ears -->
-        <circle  cx="16" cy="12" r="5"             fill="#FF6B9A"/>
-        <circle  cx="38" cy="12" r="5"             fill="#FF6B9A"/>
-        <!-- Eyes -->
-        <circle  cx="22" cy="21" r="3"             fill="#7a2050"/>
-        <circle  cx="32" cy="21" r="3"             fill="#7a2050"/>
-        <circle  cx="23" cy="20" r="1"             fill="white"/>
-        <circle  cx="33" cy="20" r="1"             fill="white"/>
-        <!-- Smile -->
-        <path d="M21,27 Q27,32 33,27" fill="none" stroke="#7a2050" stroke-width="1.5" stroke-linecap="round"/>
-        <!-- Belly shine -->
-        <ellipse cx="27" cy="40" rx="7" ry="9" fill="rgba(255,255,255,.2)"/>
-      </svg>
-    </div>
-    <!-- Gummy 2 (green) -->
-    <div class="gummy gummy-2">
-      <svg width="50" height="65" viewBox="0 0 50 65" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="6"  cy="23" rx="13" ry="8" fill="rgba(180,255,200,.65)" transform="rotate(-28 6 23)" class="wing"/>
-        <ellipse cx="44" cy="23" rx="13" ry="8" fill="rgba(180,255,200,.65)" transform="rotate(28 44 23)"  class="wing"/>
-        <ellipse cx="25" cy="40" rx="15" ry="18" fill="#7CDB7C"/>
-        <circle  cx="25" cy="21" r="14"           fill="#7CDB7C"/>
-        <circle  cx="15" cy="11" r="4.5"           fill="#5cb85c"/>
-        <circle  cx="35" cy="11" r="4.5"           fill="#5cb85c"/>
-        <circle  cx="21" cy="20" r="3"             fill="#1e5c1e"/>
-        <circle  cx="31" cy="20" r="3"             fill="#1e5c1e"/>
-        <circle  cx="22" cy="19" r="1"             fill="white"/>
-        <circle  cx="32" cy="19" r="1"             fill="white"/>
-        <path d="M19,26 Q25,31 31,26" fill="none" stroke="#1e5c1e" stroke-width="1.5" stroke-linecap="round"/>
-        <ellipse cx="25" cy="38" rx="6" ry="8" fill="rgba(255,255,255,.2)"/>
-      </svg>
-    </div>
-    <!-- Gummy 3 (blue) -->
-    <div class="gummy gummy-3">
-      <svg width="48" height="62" viewBox="0 0 48 62" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="6"  cy="22" rx="12" ry="7" fill="rgba(180,220,255,.65)" transform="rotate(-25 6 22)" class="wing"/>
-        <ellipse cx="42" cy="22" rx="12" ry="7" fill="rgba(180,220,255,.65)" transform="rotate(25 42 22)"  class="wing"/>
-        <ellipse cx="24" cy="38" rx="14" ry="17" fill="#5AADFF"/>
-        <circle  cx="24" cy="20" r="13"           fill="#5AADFF"/>
-        <circle  cx="14" cy="11" r="4"             fill="#2d8ad4"/>
-        <circle  cx="34" cy="11" r="4"             fill="#2d8ad4"/>
-        <circle  cx="20" cy="19" r="2.8"           fill="#1a4a80"/>
-        <circle  cx="30" cy="19" r="2.8"           fill="#1a4a80"/>
-        <circle  cx="21" cy="18" r="1"             fill="white"/>
-        <circle  cx="31" cy="18" r="1"             fill="white"/>
-        <path d="M18,25 Q24,30 30,25" fill="none" stroke="#1a4a80" stroke-width="1.5" stroke-linecap="round"/>
-        <ellipse cx="24" cy="37" rx="6" ry="8" fill="rgba(255,255,255,.2)"/>
-      </svg>
-    </div>
-    <!-- Gummy 4 (yellow) -->
-    <div class="gummy gummy-4">
-      <svg width="46" height="60" viewBox="0 0 46 60" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="5"  cy="21" rx="12" ry="7" fill="rgba(255,240,150,.65)" transform="rotate(-28 5 21)" class="wing"/>
-        <ellipse cx="41" cy="21" rx="12" ry="7" fill="rgba(255,240,150,.65)" transform="rotate(28 41 21)"  class="wing"/>
-        <ellipse cx="23" cy="37" rx="14" ry="17" fill="#FFD043"/>
-        <circle  cx="23" cy="19" r="13"           fill="#FFD043"/>
-        <circle  cx="13" cy="10" r="4"             fill="#e6a800"/>
-        <circle  cx="33" cy="10" r="4"             fill="#e6a800"/>
-        <circle  cx="19" cy="18" r="2.8"           fill="#7a5500"/>
-        <circle  cx="29" cy="18" r="2.8"           fill="#7a5500"/>
-        <circle  cx="20" cy="17" r="1"             fill="white"/>
-        <circle  cx="30" cy="17" r="1"             fill="white"/>
-        <path d="M17,24 Q23,29 29,24" fill="none" stroke="#7a5500" stroke-width="1.5" stroke-linecap="round"/>
-        <ellipse cx="23" cy="36" rx="6" ry="8" fill="rgba(255,255,255,.2)"/>
-      </svg>
-    </div>
-  </div>
-
-  <!-- Magic Fairies Layer -->
-  <div class="fairy-layer">
-    <div class="fairy fairy-1">✨🧚</div>
-    <div class="fairy fairy-2">🧚✨</div>
-    <div class="fairy fairy-3">✨🧚‍♀️</div>
-    <div class="fairy fairy-4">🌟🧚</div>
-    <div class="fairy fairy-5">🧚‍♀️✨</div>
-  </div>
-
-  <!-- Floating Storybooks Layer -->
-  <div class="book-layer">
-    <!-- Book 1 -->
-    <div class="storybook book-1">
-      <svg width="72" height="60" viewBox="0 0 72 60" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2"  y="5" width="32" height="48" rx="4" fill="#E0C8FF" transform="rotate(-12 18 29)"/>
-        <rect x="38" y="5" width="32" height="48" rx="4" fill="#FFD6E8" transform="rotate(12 54 29)"/>
-        <rect x="28" y="8" width="16" height="44" rx="2" fill="#d4aaff"/>
-        <!-- Lines on pages -->
-        <line x1="8"  y1="20" x2="28" y2="20" stroke="rgba(130,80,200,.3)" stroke-width="1.5" transform="rotate(-12 18 29)"/>
-        <line x1="8"  y1="28" x2="28" y2="28" stroke="rgba(130,80,200,.3)" stroke-width="1.5" transform="rotate(-12 18 29)"/>
-        <line x1="44" y1="20" x2="64" y2="20" stroke="rgba(200,80,130,.3)" stroke-width="1.5" transform="rotate(12 54 29)"/>
-        <line x1="44" y1="28" x2="64" y2="28" stroke="rgba(200,80,130,.3)" stroke-width="1.5" transform="rotate(12 54 29)"/>
-      </svg>
-      <span class="sparkle-star">⭐</span>
-      <span class="sparkle-star">✨</span>
-      <span class="sparkle-star">🌟</span>
-    </div>
-    <!-- Book 2 -->
-    <div class="storybook book-2">
-      <svg width="65" height="55" viewBox="0 0 65 55" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2"  y="4" width="29" height="44" rx="4" fill="#BFFFA0" transform="rotate(-10 16 26)"/>
-        <rect x="34" y="4" width="29" height="44" rx="4" fill="#FFE9A0" transform="rotate(10 49 26)"/>
-        <rect x="25" y="7" width="14" height="40" rx="2" fill="#90d870"/>
-        <line x1="6"  y1="18" x2="24" y2="18" stroke="rgba(60,140,30,.3)" stroke-width="1.5" transform="rotate(-10 16 26)"/>
-        <line x1="6"  y1="26" x2="24" y2="26" stroke="rgba(60,140,30,.3)" stroke-width="1.5" transform="rotate(-10 16 26)"/>
-      </svg>
-      <span class="sparkle-star">✦</span>
-      <span class="sparkle-star">⭐</span>
-      <span class="sparkle-star">✨</span>
-    </div>
-    <!-- Book 3 -->
-    <div class="storybook book-3">
-      <svg width="68" height="58" viewBox="0 0 68 58" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2"  y="5" width="30" height="46" rx="4" fill="#C9E8FF" transform="rotate(-14 17 28)"/>
-        <rect x="36" y="5" width="30" height="46" rx="4" fill="#FFB6C1" transform="rotate(14 51 28)"/>
-        <rect x="27" y="8" width="14" height="42" rx="2" fill="#88b8e0"/>
-        <line x1="6"  y1="20" x2="26" y2="20" stroke="rgba(30,80,160,.3)" stroke-width="1.5" transform="rotate(-14 17 28)"/>
-        <line x1="6"  y1="29" x2="26" y2="29" stroke="rgba(30,80,160,.3)" stroke-width="1.5" transform="rotate(-14 17 28)"/>
-      </svg>
-      <span class="sparkle-star">🌟</span>
-      <span class="sparkle-star">✦</span>
-      <span class="sparkle-star">⭐</span>
-    </div>
-  </div>
-
-  <!-- Ambient floating candy particles (JS will add these dynamically) -->
+<!-- Background gradient -->
+<div class="bg-gradient"></div>
+<!-- Biscuit Mountains SVG -->
+<svg class="mountains" preserveaspectratio="none" viewbox="0 0 1440 400" xmlns="http://www.w3.org/2000/svg">
+<!-- Far mountain (lightest, smallest) -->
+<ellipse cx="720" cy="420" fill="#f5d5e8" opacity=".5" rx="900" ry="220"></ellipse>
+<!-- Mid mountain -->
+<path d="M0,380 Q180,180 360,260 Q540,340 720,200 Q900,60 1080,200 Q1260,340 1440,260 L1440,400 L0,400Z" fill="#eec9dc" opacity=".65"></path>
+<!-- Biscuit crinkle detail -->
+<path d="M0,370 Q120,330 240,355 Q360,380 480,345 Q600,310 720,340 Q840,370 960,340 Q1080,310 1200,345 Q1320,380 1440,355 L1440,400 L0,400Z" fill="#f7d9e8" opacity=".8"></path>
+<!-- Front hill -->
+<path d="M0,395 Q360,340 720,370 Q1080,400 1440,370 L1440,400 L0,400Z" fill="#fce4f0" opacity="1"></path>
+<!-- Biscuit texture dots -->
+<circle cx="350" cy="320" fill="#ffd6e8" opacity=".6" r="6"></circle>
+<circle cx="700" cy="290" fill="#ffd6e8" opacity=".6" r="5"></circle>
+<circle cx="1100" cy="305" fill="#ffd6e8" opacity=".6" r="7"></circle>
+</svg>
+<!-- Lollipop Trees SVG layer -->
+<svg class="lollipop-layer" preserveaspectratio="none" viewbox="0 0 1440 350" xmlns="http://www.w3.org/2000/svg">
+<!-- Tree 1 - left -->
+<rect fill="#d4889a" height="80" rx="5" width="10" x="68" y="240"></rect>
+<circle cx="73" cy="210" fill="#FF8FAB" opacity=".85" r="42"></circle>
+<circle cx="73" cy="210" fill="#FFB6C1" opacity=".7" r="30"></circle>
+<circle cx="55" cy="200" fill="#fff" opacity=".5" r="7"></circle>
+<!-- Spiral on lollipop -->
+<circle cx="73" cy="210" fill="none" opacity=".5" r="15" stroke="#ff6699" stroke-width="3"></circle>
+<!-- Tree 2 - left mid -->
+<rect fill="#aad4a0" height="70" rx="4" width="8" x="218" y="260"></rect>
+<circle cx="222" cy="232" fill="#BFFFA0" opacity=".85" r="34"></circle>
+<circle cx="222" cy="232" fill="#d4ffbe" opacity=".6" r="22"></circle>
+<circle cx="210" cy="224" fill="#fff" opacity=".5" r="5"></circle>
+<!-- Tree 3 - right mid -->
+<rect fill="#aab8d4" height="75" rx="4" width="9" x="1198" y="255"></rect>
+<circle cx="1202" cy="222" fill="#B5D8F7" opacity=".85" r="38"></circle>
+<circle cx="1202" cy="222" fill="#cce8ff" opacity=".6" r="25"></circle>
+<circle cx="1188" cy="212" fill="#fff" opacity=".5" r="6"></circle>
+<!-- Tree 4 - right -->
+<rect fill="#d4c888" height="80" rx="5" width="10" x="1360" y="240"></rect>
+<circle cx="1365" cy="208" fill="#FFD580" opacity=".85" r="40"></circle>
+<circle cx="1365" cy="208" fill="#ffe9a0" opacity=".7" r="26"></circle>
+<circle cx="1350" cy="198" fill="#fff" opacity=".5" r="6"></circle>
+<!-- Small accent tree - far left -->
+<rect fill="#e0a8c8" height="55" rx="3" width="6" x="140" y="270"></rect>
+<circle cx="143" cy="248" fill="#E0C8FF" opacity=".8" r="26"></circle>
+<!-- Small accent tree - far right -->
+<rect fill="#c8d4e0" height="55" rx="3" width="6" x="1290" y="268"></rect>
+<circle cx="1293" cy="246" fill="#B5D8F7" opacity=".8" r="25"></circle>
+</svg>
+<!-- Cotton Candy Clouds layer -->
+<div class="cloud-layer" id="cloud-layer">
+<!-- Cloud 1 -->
+<div class="cloud cloud-1" data-depth="0.2">
+<svg height="90" viewbox="0 0 220 90" width="220" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="110" cy="65" fill="#FFD6E8" opacity=".75" rx="100" ry="28"></ellipse>
+<ellipse cx="70" cy="52" fill="#ffc2d9" opacity=".8" rx="55" ry="40"></ellipse>
+<ellipse cx="130" cy="48" fill="#FFD6E8" opacity=".8" rx="60" ry="45"></ellipse>
+<ellipse cx="170" cy="55" fill="#ffc2d9" opacity=".75" rx="45" ry="34"></ellipse>
+</svg>
+</div>
+<!-- Cloud 2 (bigger) -->
+<div class="cloud cloud-2" data-depth="0.35">
+<svg height="110" viewbox="0 0 290 110" width="290" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="145" cy="82" fill="#d6eeff" opacity=".7" rx="135" ry="30"></ellipse>
+<ellipse cx="90" cy="65" fill="#bddcff" opacity=".75" rx="65" ry="48"></ellipse>
+<ellipse cx="165" cy="58" fill="#d6eeff" opacity=".75" rx="75" ry="56"></ellipse>
+<ellipse cx="225" cy="68" fill="#bddcff" opacity=".7" rx="58" ry="42"></ellipse>
+</svg>
+</div>
+<!-- Cloud 3 (small) -->
+<div class="cloud cloud-3" data-depth="0.15">
+<svg height="70" viewbox="0 0 160 70" width="160" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="80" cy="52" fill="#FFE4F2" opacity=".8" rx="72" ry="20"></ellipse>
+<ellipse cx="52" cy="40" fill="#FFD6E8" opacity=".8" rx="40" ry="30"></ellipse>
+<ellipse cx="100" cy="36" fill="#FFE4F2" opacity=".8" rx="45" ry="34"></ellipse>
+<ellipse cx="130" cy="44" fill="#FFD6E8" opacity=".75" rx="32" ry="24"></ellipse>
+</svg>
+</div>
+<!-- Cloud 4 -->
+<div class="cloud cloud-4" data-depth="0.28">
+<svg height="95" viewbox="0 0 240 95" width="240" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="120" cy="72" fill="#E0C8FF" opacity=".7" rx="110" ry="25"></ellipse>
+<ellipse cx="80" cy="58" fill="#d4aaff" opacity=".75" rx="58" ry="44"></ellipse>
+<ellipse cx="150" cy="52" fill="#E0C8FF" opacity=".75" rx="66" ry="50"></ellipse>
+<ellipse cx="200" cy="62" fill="#d4aaff" opacity=".7" rx="50" ry="36"></ellipse>
+</svg>
+</div>
+</div>
+<!-- Hero Text -->
+<div class="hero-text">
+<h1>KALEIDO-6</h1>
+<p>✨ Your Magical Digital World of Learning ✨</p>
+<button class="enter-btn" id="enter-btn">Open the Portal 🌈</button>
+</div>
+<!-- SWEET CASTLE (SVG) -->
+<div class="castle-wrap" id="castle-wrap">
+<div class="castle-glow"></div>
+<svg height="300" viewbox="0 0 340 300" width="340" xmlns="http://www.w3.org/2000/svg">
+<!-- Castle base / body -->
+<rect fill="#FFB6C1" height="120" rx="14" width="200" x="70" y="160"></rect>
+<rect fill="url(#cakeStripe)" height="120" opacity=".5" rx="14" width="200" x="70" y="160"></rect>
+<!-- Cake stripes on body -->
+<defs>
+<pattern height="12" id="cakeStripe" patterntransform="rotate(45)" patternunits="userSpaceOnUse" width="12">
+<rect fill="rgba(255,255,255,.25)" height="12" width="6"></rect>
+</pattern>
+<radialgradient cx="50%" cy="30%" id="towerGrad" r="60%">
+<stop offset="0%" stop-color="#fff0f5"></stop>
+<stop offset="100%" stop-color="#FFB6C1"></stop>
+</radialgradient>
+<radialgradient cx="50%" cy="0%" id="roofGrad" r="100%">
+<stop offset="0%" stop-color="#FF6BB3"></stop>
+<stop offset="100%" stop-color="#FF8FAB"></stop>
+</radialgradient>
+<filter id="castleGlow">
+<fegaussianblur result="blur" stddeviation="4"></fegaussianblur>
+<fecomposite in="SourceGraphic" in2="blur" operator="over"></fecomposite>
+</filter>
+</defs>
+<!-- Icing drip on body -->
+<path d="M70,165 Q90,180 110,165 Q130,150 150,165 Q170,180 190,165 Q210,150 230,165 Q250,180 270,165 L270,175 Q250,195 230,180 Q210,165 190,180 Q170,195 150,180 Q130,165 110,180 Q90,195 70,180Z" fill="white" opacity=".7"></path>
+<!-- Gate arch (door) -->
+<path d="M150,280 L150,225 Q170,205 190,225 L190,280Z" fill="#FFD6E8"></path>
+<path d="M150,225 Q170,200 190,225" fill="none" stroke="#FF8FAB" stroke-width="3"></path>
+<!-- Gate candy-cane stripes -->
+<path d="M153,245 L187,245" opacity=".5" stroke="#FF6BB3" stroke-width="2.5"></path>
+<path d="M153,258 L187,258" opacity=".5" stroke="#FF6BB3" stroke-width="2.5"></path>
+<!-- Windows -->
+<rect fill="#ffe0f0" height="28" rx="14" width="28" x="90" y="185"></rect>
+<rect fill="#ffe0f0" height="28" rx="14" width="28" x="222" y="185"></rect>
+<circle cx="104" cy="199" fill="#FF8FAB" opacity=".8" r="6"></circle>
+<circle cx="236" cy="199" fill="#FF8FAB" opacity=".8" r="6"></circle>
+<!-- Left tower -->
+<rect fill="url(#towerGrad)" height="90" rx="8" width="55" x="55" y="130"></rect>
+<!-- Left tower roof (cone) -->
+<polygon fill="url(#roofGrad)" points="82,75 35,130 130,130"></polygon>
+<!-- Candy ball on left tower -->
+<circle cx="82" cy="72" fill="#FFD580" r="12"></circle>
+<circle cx="78" cy="68" fill="rgba(255,255,255,.5)" r="4"></circle>
+<!-- Right tower -->
+<rect fill="url(#towerGrad)" height="90" rx="8" width="55" x="230" y="130"></rect>
+<!-- Right tower roof (cone) -->
+<polygon fill="url(#roofGrad)" points="257,75 210,130 305,130"></polygon>
+<!-- Candy ball on right tower -->
+<circle cx="257" cy="72" fill="#BFFFA0" r="12"></circle>
+<circle cx="253" cy="68" fill="rgba(255,255,255,.5)" r="4"></circle>
+<!-- Center tall tower -->
+<rect fill="url(#towerGrad)" height="100" rx="8" width="70" x="135" y="100"></rect>
+<!-- Center tower roof -->
+<polygon fill="#FF6BB3" points="170,38 118,100 222,100"></polygon>
+<!-- Candy star on center tower -->
+<text fill="#FFD580" font-size="22" text-anchor="middle" x="170" y="45">★</text>
+<!-- Icing on center tower roof -->
+<path d="M118,100 Q130,115 142,100 Q154,85 166,100 Q178,115 190,100 Q202,85 214,100 Q218,100 222,100" fill="white" opacity=".6"></path>
+<!-- Candy cane flag poles -->
+<line stroke="#d4889a" stroke-width="2.5" x1="82" x2="82" y1="62" y2="40"></line>
+<polygon fill="#FF6BB3" points="82,40 100,48 82,56"></polygon>
+<line stroke="#aad4a0" stroke-width="2.5" x1="257" x2="257" y1="62" y2="40"></line>
+<polygon fill="#BFFFA0" points="257,40 275,48 257,56"></polygon>
+<!-- Macarons on base wall -->
+<circle cx="100" cy="162" fill="#FFD580" r="7" stroke="#fff" stroke-width="1.5"></circle>
+<circle cx="120" cy="162" fill="#FF8FAB" r="7" stroke="#fff" stroke-width="1.5"></circle>
+<circle cx="220" cy="162" fill="#BFFFA0" r="7" stroke="#fff" stroke-width="1.5"></circle>
+<circle cx="240" cy="162" fill="#E0C8FF" r="7" stroke="#fff" stroke-width="1.5"></circle>
+<!-- Glow highlights on castle -->
+<ellipse cx="170" cy="295" fill="rgba(255,150,200,.2)" rx="130" ry="12"></ellipse>
+</svg>
+</div>
+<!-- Gummy Bears Layer -->
+<div class="gummy-layer">
+<!-- Gummy 1 (pink) -->
+<div class="gummy gummy-1">
+<svg height="70" viewbox="0 0 54 70" width="54" xmlns="http://www.w3.org/2000/svg">
+<!-- Wings -->
+<ellipse class="wing" cx="7" cy="25" fill="rgba(220,180,255,.65)" rx="14" ry="9" transform="rotate(-30 7 25)"></ellipse>
+<ellipse class="wing" cx="47" cy="25" fill="rgba(220,180,255,.65)" rx="14" ry="9" transform="rotate(30 47 25)"></ellipse>
+<!-- Body -->
+<ellipse cx="27" cy="42" fill="#FF8FAB" rx="16" ry="19"></ellipse>
+<!-- Head -->
+<circle cx="27" cy="22" fill="#FF8FAB" r="15"></circle>
+<!-- Ears -->
+<circle cx="16" cy="12" fill="#FF6B9A" r="5"></circle>
+<circle cx="38" cy="12" fill="#FF6B9A" r="5"></circle>
+<!-- Eyes -->
+<circle cx="22" cy="21" fill="#7a2050" r="3"></circle>
+<circle cx="32" cy="21" fill="#7a2050" r="3"></circle>
+<circle cx="23" cy="20" fill="white" r="1"></circle>
+<circle cx="33" cy="20" fill="white" r="1"></circle>
+<!-- Smile -->
+<path d="M21,27 Q27,32 33,27" fill="none" stroke="#7a2050" stroke-linecap="round" stroke-width="1.5"></path>
+<!-- Belly shine -->
+<ellipse cx="27" cy="40" fill="rgba(255,255,255,.2)" rx="7" ry="9"></ellipse>
+</svg>
+</div>
+<!-- Gummy 2 (green) -->
+<div class="gummy gummy-2">
+<svg height="65" viewbox="0 0 50 65" width="50" xmlns="http://www.w3.org/2000/svg">
+<ellipse class="wing" cx="6" cy="23" fill="rgba(180,255,200,.65)" rx="13" ry="8" transform="rotate(-28 6 23)"></ellipse>
+<ellipse class="wing" cx="44" cy="23" fill="rgba(180,255,200,.65)" rx="13" ry="8" transform="rotate(28 44 23)"></ellipse>
+<ellipse cx="25" cy="40" fill="#7CDB7C" rx="15" ry="18"></ellipse>
+<circle cx="25" cy="21" fill="#7CDB7C" r="14"></circle>
+<circle cx="15" cy="11" fill="#5cb85c" r="4.5"></circle>
+<circle cx="35" cy="11" fill="#5cb85c" r="4.5"></circle>
+<circle cx="21" cy="20" fill="#1e5c1e" r="3"></circle>
+<circle cx="31" cy="20" fill="#1e5c1e" r="3"></circle>
+<circle cx="22" cy="19" fill="white" r="1"></circle>
+<circle cx="32" cy="19" fill="white" r="1"></circle>
+<path d="M19,26 Q25,31 31,26" fill="none" stroke="#1e5c1e" stroke-linecap="round" stroke-width="1.5"></path>
+<ellipse cx="25" cy="38" fill="rgba(255,255,255,.2)" rx="6" ry="8"></ellipse>
+</svg>
+</div>
+<!-- Gummy 3 (blue) -->
+<div class="gummy gummy-3">
+<svg height="62" viewbox="0 0 48 62" width="48" xmlns="http://www.w3.org/2000/svg">
+<ellipse class="wing" cx="6" cy="22" fill="rgba(180,220,255,.65)" rx="12" ry="7" transform="rotate(-25 6 22)"></ellipse>
+<ellipse class="wing" cx="42" cy="22" fill="rgba(180,220,255,.65)" rx="12" ry="7" transform="rotate(25 42 22)"></ellipse>
+<ellipse cx="24" cy="38" fill="#5AADFF" rx="14" ry="17"></ellipse>
+<circle cx="24" cy="20" fill="#5AADFF" r="13"></circle>
+<circle cx="14" cy="11" fill="#2d8ad4" r="4"></circle>
+<circle cx="34" cy="11" fill="#2d8ad4" r="4"></circle>
+<circle cx="20" cy="19" fill="#1a4a80" r="2.8"></circle>
+<circle cx="30" cy="19" fill="#1a4a80" r="2.8"></circle>
+<circle cx="21" cy="18" fill="white" r="1"></circle>
+<circle cx="31" cy="18" fill="white" r="1"></circle>
+<path d="M18,25 Q24,30 30,25" fill="none" stroke="#1a4a80" stroke-linecap="round" stroke-width="1.5"></path>
+<ellipse cx="24" cy="37" fill="rgba(255,255,255,.2)" rx="6" ry="8"></ellipse>
+</svg>
+</div>
+<!-- Gummy 4 (yellow) -->
+<div class="gummy gummy-4">
+<svg height="60" viewbox="0 0 46 60" width="46" xmlns="http://www.w3.org/2000/svg">
+<ellipse class="wing" cx="5" cy="21" fill="rgba(255,240,150,.65)" rx="12" ry="7" transform="rotate(-28 5 21)"></ellipse>
+<ellipse class="wing" cx="41" cy="21" fill="rgba(255,240,150,.65)" rx="12" ry="7" transform="rotate(28 41 21)"></ellipse>
+<ellipse cx="23" cy="37" fill="#FFD043" rx="14" ry="17"></ellipse>
+<circle cx="23" cy="19" fill="#FFD043" r="13"></circle>
+<circle cx="13" cy="10" fill="#e6a800" r="4"></circle>
+<circle cx="33" cy="10" fill="#e6a800" r="4"></circle>
+<circle cx="19" cy="18" fill="#7a5500" r="2.8"></circle>
+<circle cx="29" cy="18" fill="#7a5500" r="2.8"></circle>
+<circle cx="20" cy="17" fill="white" r="1"></circle>
+<circle cx="30" cy="17" fill="white" r="1"></circle>
+<path d="M17,24 Q23,29 29,24" fill="none" stroke="#7a5500" stroke-linecap="round" stroke-width="1.5"></path>
+<ellipse cx="23" cy="36" fill="rgba(255,255,255,.2)" rx="6" ry="8"></ellipse>
+</svg>
+</div>
+</div>
+<!-- Magic Fairies Layer -->
+<div class="fairy-layer">
+<div class="fairy fairy-1">✨🧚</div>
+<div class="fairy fairy-2">🧚✨</div>
+<div class="fairy fairy-3">✨🧚‍♀️</div>
+<div class="fairy fairy-4">🌟🧚</div>
+<div class="fairy fairy-5">🧚‍♀️✨</div>
+</div>
+<!-- Floating Storybooks Layer -->
+<div class="book-layer">
+<!-- Book 1 -->
+<div class="storybook book-1">
+<svg height="60" viewbox="0 0 72 60" width="72" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#E0C8FF" height="48" rx="4" transform="rotate(-12 18 29)" width="32" x="2" y="5"></rect>
+<rect fill="#FFD6E8" height="48" rx="4" transform="rotate(12 54 29)" width="32" x="38" y="5"></rect>
+<rect fill="#d4aaff" height="44" rx="2" width="16" x="28" y="8"></rect>
+<!-- Lines on pages -->
+<line stroke="rgba(130,80,200,.3)" stroke-width="1.5" transform="rotate(-12 18 29)" x1="8" x2="28" y1="20" y2="20"></line>
+<line stroke="rgba(130,80,200,.3)" stroke-width="1.5" transform="rotate(-12 18 29)" x1="8" x2="28" y1="28" y2="28"></line>
+<line stroke="rgba(200,80,130,.3)" stroke-width="1.5" transform="rotate(12 54 29)" x1="44" x2="64" y1="20" y2="20"></line>
+<line stroke="rgba(200,80,130,.3)" stroke-width="1.5" transform="rotate(12 54 29)" x1="44" x2="64" y1="28" y2="28"></line>
+</svg>
+<span class="sparkle-star">⭐</span>
+<span class="sparkle-star">✨</span>
+<span class="sparkle-star">🌟</span>
+</div>
+<!-- Book 2 -->
+<div class="storybook book-2">
+<svg height="55" viewbox="0 0 65 55" width="65" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#BFFFA0" height="44" rx="4" transform="rotate(-10 16 26)" width="29" x="2" y="4"></rect>
+<rect fill="#FFE9A0" height="44" rx="4" transform="rotate(10 49 26)" width="29" x="34" y="4"></rect>
+<rect fill="#90d870" height="40" rx="2" width="14" x="25" y="7"></rect>
+<line stroke="rgba(60,140,30,.3)" stroke-width="1.5" transform="rotate(-10 16 26)" x1="6" x2="24" y1="18" y2="18"></line>
+<line stroke="rgba(60,140,30,.3)" stroke-width="1.5" transform="rotate(-10 16 26)" x1="6" x2="24" y1="26" y2="26"></line>
+</svg>
+<span class="sparkle-star">✦</span>
+<span class="sparkle-star">⭐</span>
+<span class="sparkle-star">✨</span>
+</div>
+<!-- Book 3 -->
+<div class="storybook book-3">
+<svg height="58" viewbox="0 0 68 58" width="68" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#C9E8FF" height="46" rx="4" transform="rotate(-14 17 28)" width="30" x="2" y="5"></rect>
+<rect fill="#FFB6C1" height="46" rx="4" transform="rotate(14 51 28)" width="30" x="36" y="5"></rect>
+<rect fill="#88b8e0" height="42" rx="2" width="14" x="27" y="8"></rect>
+<line stroke="rgba(30,80,160,.3)" stroke-width="1.5" transform="rotate(-14 17 28)" x1="6" x2="26" y1="20" y2="20"></line>
+<line stroke="rgba(30,80,160,.3)" stroke-width="1.5" transform="rotate(-14 17 28)" x1="6" x2="26" y1="29" y2="29"></line>
+</svg>
+<span class="sparkle-star">🌟</span>
+<span class="sparkle-star">✦</span>
+<span class="sparkle-star">⭐</span>
+</div>
+</div>
+<!-- Ambient floating candy particles (JS will add these dynamically) -->
 </div><!-- end #landing-page -->
-
-
 <!-- ============================================================
      DASHBOARD PAGE
      ============================================================ -->
 <div id="dashboard-page">
-  <div class="dash-header">
-    <button class="back-btn" id="back-btn">← Back</button>
-    <h2>📚 KALEIDO-6 Subjects</h2>
-    <p>Tap a subject to explore chapters! ✨</p>
-  </div>
+<div class="dash-header">
+<button class="back-btn" id="back-btn">← Back</button>
+<h2>📚 KALEIDO-6 Subjects</h2>
+<p>Tap a subject to explore chapters! ✨</p>
+</div>
+<div class="panels-wrap">
+<!-- English Panel -->
+<div class="subject-panel panel-english" id="panel-english">
+<div class="panel-icon">📖</div>
+<div class="panel-title">English</div>
+<div class="panel-sub">Stories · Grammar · Poetry</div>
 
-  <div class="panels-wrap">
+</div>
+<!-- Science Panel -->
+<div class="subject-panel panel-science" id="panel-science">
+<div class="panel-icon">🔬</div>
+<div class="panel-title">Science</div>
+<div class="panel-sub">Nature · Experiments · Space</div>
 
-    <!-- English Panel -->
-    <div class="subject-panel panel-english" id="panel-english">
-      <div class="panel-icon">📖</div>
-      <div class="panel-title">English</div>
-      <div class="panel-sub">Stories · Grammar · Poetry</div>
-      <div class="chapter-list" id="chapters-english">
-        <!-- Replace each href below with the actual chapter HTML file path in your GitHub repo. -->
-        <a class="chapter-item" href="English/a-bottle-of-dew.html">Chapter 1: A Bottle of Dew</a>
-        <a class="chapter-item" href="English/the-raven-and-the-fox.html">Chapter 2: The Raven and the Fox</a>
-        <a class="chapter-item" href="English/rama-to-the-rescue.html">Chapter 3: Rama to the Rescue</a>
-        <a class="chapter-item" href="English/the-unlikely-best-friends.html">Chapter 4: The Unlikely Best Friends</a>
-        <a class="chapter-item" href="English/a-friend-s-prayer.html">Chapter 5: A Friend&#x27;s Prayer</a>
-        <a class="chapter-item" href="English/the-chair.html">Chapter 6: The Chair</a>
-        <a class="chapter-item" href="English/neem-baba.html">Chapter 7: Neem Baba</a>
-        <a class="chapter-item" href="English/what-a-bird-thought.html">Chapter 8: What a Bird Thought</a>
-        <a class="chapter-item" href="English/spices-that-heal-us.html">Chapter 9: Spices that Heal Us</a>
-        <a class="chapter-item" href="English/change-of-heart.html">Chapter 10: Change of Heart</a>
-        <a class="chapter-item" href="English/the-winner.html">Chapter 11: The Winner</a>
-        <a class="chapter-item" href="English/yoga-a-way-of-life.html">Chapter 12: Yoga — A Way of Life</a>
-        <a class="chapter-item" href="English/hamara-bharat-incredible-india.html">Chapter 13: Hamara Bharat — Incredible India!</a>
-        <a class="chapter-item" href="English/the-kites.html">Chapter 14: The Kites</a>
-        <a class="chapter-item" href="English/ila-sachani-embroidering-dreams-with-her-feet.html">Chapter 15: Ila Sachani: Embroidering Dreams with her Feet</a>
-        <a class="chapter-item" href="English/national-war-memorial.html">Chapter 16: National War Memorial</a>
-      </div>
-    </div>
+</div>
+<!-- Math Panel -->
+<div class="subject-panel panel-math" id="panel-math">
+<div class="panel-icon">🔢</div>
+<div class="panel-title">Mathematics</div>
+<div class="panel-sub">Numbers · Shapes · Logic</div>
 
-    <!-- Science Panel -->
-    <div class="subject-panel panel-science" id="panel-science">
-      <div class="panel-icon">🔬</div>
-      <div class="panel-title">Science</div>
-      <div class="panel-sub">Nature · Experiments · Space</div>
-      <div class="chapter-list" id="chapters-science">
-        <!-- Replace each href below with the actual chapter HTML file path in your GitHub repo. -->
-        <a class="chapter-item" href="Science/the-wonderful-world-of-science.html">Chapter 1: The Wonderful World of Science</a>
-        <a class="chapter-item" href="Science/diversity-in-the-living-world.html">Chapter 2: Diversity in the Living World</a>
-        <a class="chapter-item" href="Science/mindful-eating-a-path-to-a-healthy-body.html">Chapter 3: Mindful Eating: A Path to a Healthy Body</a>
-        <a class="chapter-item" href="Science/exploring-magnets.html">Chapter 4: Exploring Magnets</a>
-        <a class="chapter-item" href="Science/measurement-of-length-and-motion.html">Chapter 5: Measurement of Length and Motion</a>
-        <a class="chapter-item" href="Science/materials-around-us.html">Chapter 6: Materials Around Us</a>
-        <a class="chapter-item" href="Science/temperature-and-its-measurement.html">Chapter 7: Temperature and its Measurement</a>
-        <a class="chapter-item" href="Science/a-journey-through-states-of-water.html">Chapter 8: A Journey through States of Water</a>
-        <a class="chapter-item" href="Science/methods-of-separation-in-everyday-life.html">Chapter 9: Methods of Separation in Everyday Life</a>
-        <a class="chapter-item" href="Science/living-creatures-exploring-their-characteristics.html">Chapter 10: Living Creatures: Exploring their Characteristics</a>
-        <a class="chapter-item" href="Science/nature-s-treasures.html">Chapter 11: Nature&#x27;s Treasures</a>
-        <a class="chapter-item" href="Science/beyond-earth.html">Chapter 12: Beyond Earth</a>
-      </div>
-    </div>
+</div>
+<!-- Social Science Panel -->
+<div class="subject-panel panel-social" id="panel-social">
+<div class="panel-icon">🌍</div>
+<div class="panel-title">Social Studies</div>
+<div class="panel-sub">History · Civics · Maps</div>
 
-    <!-- Math Panel -->
-    <div class="subject-panel panel-math" id="panel-math">
-      <div class="panel-icon">🔢</div>
-      <div class="panel-title">Mathematics</div>
-      <div class="panel-sub">Numbers · Shapes · Logic</div>
-      <div class="chapter-list" id="chapters-math">
-        <!-- Replace each href below with the actual chapter HTML file path in your GitHub repo. -->
-        <a class="chapter-item" href="Mathematics/patterns-in-mathematics.html">Chapter 1: Patterns in Mathematics</a>
-        <a class="chapter-item" href="Mathematics/lines-and-angles.html">Chapter 2: Lines and Angles</a>
-        <a class="chapter-item" href="Mathematics/number-play.html">Chapter 3: Number Play</a>
-        <a class="chapter-item" href="Mathematics/data-handling-and-presentation.html">Chapter 4: Data Handling and Presentation</a>
-        <a class="chapter-item" href="Mathematics/prime-time.html">Chapter 5: Prime Time</a>
-        <a class="chapter-item" href="Mathematics/perimeter-and-area.html">Chapter 6: Perimeter and Area</a>
-        <a class="chapter-item" href="Mathematics/fractions.html">Chapter 7: Fractions</a>
-        <a class="chapter-item" href="Mathematics/playing-with-constructions.html">Chapter 8: Playing with Constructions</a>
-        <a class="chapter-item" href="Mathematics/symmetry.html">Chapter 9: Symmetry</a>
-        <a class="chapter-item" href="Mathematics/the-other-side-of-zero.html">Chapter 10: The Other Side of Zero</a>
-      </div>
-    </div>
-
-    <!-- Social Science Panel -->
-    <div class="subject-panel panel-social" id="panel-social">
-      <div class="panel-icon">🌍</div>
-      <div class="panel-title">Social Studies</div>
-      <div class="panel-sub">History · Civics · Maps</div>
-      <div class="chapter-list" id="chapters-social">
-        <!-- Replace each href below with the actual chapter HTML file path in your GitHub repo. -->
-        <a class="chapter-item" href="Social%20Studies/locating-places-on-the-earth.html">Chapter 1: Locating Places on the Earth</a>
-        <a class="chapter-item" href="Social%20Studies/oceans-and-continents.html">Chapter 2: Oceans and Continents</a>
-        <a class="chapter-item" href="Social%20Studies/landforms-and-life.html">Chapter 3: Landforms and Life</a>
-        <a class="chapter-item" href="Social%20Studies/timeline-and-sources-of-history.html">Chapter 4: Timeline and Sources of History</a>
-        <a class="chapter-item" href="Social%20Studies/india-that-is-bharat.html">Chapter 5: India, That Is Bharat</a>
-        <a class="chapter-item" href="Social%20Studies/the-beginnings-of-indian-civilisation.html">Chapter 6: The Beginnings of Indian Civilisation</a>
-        <a class="chapter-item" href="Social%20Studies/india-s-cultural-roots.html">Chapter 7: India&#x27;s Cultural Roots</a>
-        <a class="chapter-item" href="Social%20Studies/unity-in-diversity-or-many-in-the-one.html">Chapter 8: Unity in Diversity, or &#x27;Many in the One&#x27;</a>
-        <a class="chapter-item" href="Social%20Studies/family-and-community.html">Chapter 9: Family and Community</a>
-        <a class="chapter-item" href="Social%20Studies/grassroots-democracy-part-1-governance.html">Chapter 10: Grassroots Democracy — Part 1: Governance</a>
-        <a class="chapter-item" href="Social%20Studies/grassroots-democracy-part-2-local-government-in-rural-areas.html">Chapter 11: Grassroots Democracy — Part 2: Local Government in Rural Areas</a>
-        <a class="chapter-item" href="Social%20Studies/grassroots-democracy-part-3-local-government-in-urban-areas.html">Chapter 12: Grassroots Democracy — Part 3: Local Government in Urban Areas</a>
-        <a class="chapter-item" href="Social%20Studies/the-value-of-work.html">Chapter 13: The Value of Work</a>
-        <a class="chapter-item" href="Social%20Studies/economic-activities-around-us.html">Chapter 14: Economic Activities Around Us</a>
-      </div>
-    </div>
-
-  </div>
+</div>
+</div><div class="selected-chapters-area" id="selected-chapters-area"><h3 id="selected-chapters-title">Choose a subject to view chapters</h3><div class="chapter-list chapters-english-theme" id="chapters-english">
+<!-- Replace each href below with the actual chapter HTML file path in your GitHub repo. -->
+<a class="chapter-item" href="English/a-bottle-of-dew.html">Chapter 1: A Bottle of Dew</a>
+<a class="chapter-item" href="English/the-raven-and-the-fox.html">Chapter 2: The Raven and the Fox</a>
+<a class="chapter-item" href="English/rama-to-the-rescue.html">Chapter 3: Rama to the Rescue</a>
+<a class="chapter-item" href="English/the-unlikely-best-friends.html">Chapter 4: The Unlikely Best Friends</a>
+<a class="chapter-item" href="English/a-friend-s-prayer.html">Chapter 5: A Friend's Prayer</a>
+<a class="chapter-item" href="English/the-chair.html">Chapter 6: The Chair</a>
+<a class="chapter-item" href="English/neem-baba.html">Chapter 7: Neem Baba</a>
+<a class="chapter-item" href="English/what-a-bird-thought.html">Chapter 8: What a Bird Thought</a>
+<a class="chapter-item" href="English/spices-that-heal-us.html">Chapter 9: Spices that Heal Us</a>
+<a class="chapter-item" href="English/change-of-heart.html">Chapter 10: Change of Heart</a>
+<a class="chapter-item" href="English/the-winner.html">Chapter 11: The Winner</a>
+<a class="chapter-item" href="English/yoga-a-way-of-life.html">Chapter 12: Yoga — A Way of Life</a>
+<a class="chapter-item" href="English/hamara-bharat-incredible-india.html">Chapter 13: Hamara Bharat — Incredible India!</a>
+<a class="chapter-item" href="English/the-kites.html">Chapter 14: The Kites</a>
+<a class="chapter-item" href="English/ila-sachani-embroidering-dreams-with-her-feet.html">Chapter 15: Ila Sachani: Embroidering Dreams with her Feet</a>
+<a class="chapter-item" href="English/national-war-memorial.html">Chapter 16: National War Memorial</a>
+</div><div class="chapter-list chapters-science-theme" id="chapters-science">
+<!-- Replace each href below with the actual chapter HTML file path in your GitHub repo. -->
+<a class="chapter-item" href="Science/the-wonderful-world-of-science.html">Chapter 1: The Wonderful World of Science</a>
+<a class="chapter-item" href="Science/diversity-in-the-living-world.html">Chapter 2: Diversity in the Living World</a>
+<a class="chapter-item" href="Science/mindful-eating-a-path-to-a-healthy-body.html">Chapter 3: Mindful Eating: A Path to a Healthy Body</a>
+<a class="chapter-item" href="Science/exploring-magnets.html">Chapter 4: Exploring Magnets</a>
+<a class="chapter-item" href="Science/measurement-of-length-and-motion.html">Chapter 5: Measurement of Length and Motion</a>
+<a class="chapter-item" href="Science/materials-around-us.html">Chapter 6: Materials Around Us</a>
+<a class="chapter-item" href="Science/temperature-and-its-measurement.html">Chapter 7: Temperature and its Measurement</a>
+<a class="chapter-item" href="Science/a-journey-through-states-of-water.html">Chapter 8: A Journey through States of Water</a>
+<a class="chapter-item" href="Science/methods-of-separation-in-everyday-life.html">Chapter 9: Methods of Separation in Everyday Life</a>
+<a class="chapter-item" href="Science/living-creatures-exploring-their-characteristics.html">Chapter 10: Living Creatures: Exploring their Characteristics</a>
+<a class="chapter-item" href="Science/nature-s-treasures.html">Chapter 11: Nature's Treasures</a>
+<a class="chapter-item" href="Science/beyond-earth.html">Chapter 12: Beyond Earth</a>
+</div><div class="chapter-list chapters-math-theme" id="chapters-math">
+<!-- Replace each href below with the actual chapter HTML file path in your GitHub repo. -->
+<a class="chapter-item" href="Mathematics/patterns-in-mathematics.html">Chapter 1: Patterns in Mathematics</a>
+<a class="chapter-item" href="Mathematics/lines-and-angles.html">Chapter 2: Lines and Angles</a>
+<a class="chapter-item" href="Mathematics/number-play.html">Chapter 3: Number Play</a>
+<a class="chapter-item" href="Mathematics/data-handling-and-presentation.html">Chapter 4: Data Handling and Presentation</a>
+<a class="chapter-item" href="Mathematics/prime-time.html">Chapter 5: Prime Time</a>
+<a class="chapter-item" href="Mathematics/perimeter-and-area.html">Chapter 6: Perimeter and Area</a>
+<a class="chapter-item" href="Mathematics/fractions.html">Chapter 7: Fractions</a>
+<a class="chapter-item" href="Mathematics/playing-with-constructions.html">Chapter 8: Playing with Constructions</a>
+<a class="chapter-item" href="Mathematics/symmetry.html">Chapter 9: Symmetry</a>
+<a class="chapter-item" href="Mathematics/the-other-side-of-zero.html">Chapter 10: The Other Side of Zero</a>
+</div><div class="chapter-list chapters-social-theme" id="chapters-social">
+<!-- Replace each href below with the actual chapter HTML file path in your GitHub repo. -->
+<a class="chapter-item" href="Social%20Studies/locating-places-on-the-earth.html">Chapter 1: Locating Places on the Earth</a>
+<a class="chapter-item" href="Social%20Studies/oceans-and-continents.html">Chapter 2: Oceans and Continents</a>
+<a class="chapter-item" href="Social%20Studies/landforms-and-life.html">Chapter 3: Landforms and Life</a>
+<a class="chapter-item" href="Social%20Studies/timeline-and-sources-of-history.html">Chapter 4: Timeline and Sources of History</a>
+<a class="chapter-item" href="Social%20Studies/india-that-is-bharat.html">Chapter 5: India, That Is Bharat</a>
+<a class="chapter-item" href="Social%20Studies/the-beginnings-of-indian-civilisation.html">Chapter 6: The Beginnings of Indian Civilisation</a>
+<a class="chapter-item" href="Social%20Studies/india-s-cultural-roots.html">Chapter 7: India's Cultural Roots</a>
+<a class="chapter-item" href="Social%20Studies/unity-in-diversity-or-many-in-the-one.html">Chapter 8: Unity in Diversity, or 'Many in the One'</a>
+<a class="chapter-item" href="Social%20Studies/family-and-community.html">Chapter 9: Family and Community</a>
+<a class="chapter-item" href="Social%20Studies/grassroots-democracy-part-1-governance.html">Chapter 10: Grassroots Democracy — Part 1: Governance</a>
+<a class="chapter-item" href="Social%20Studies/grassroots-democracy-part-2-local-government-in-rural-areas.html">Chapter 11: Grassroots Democracy — Part 2: Local Government in Rural Areas</a>
+<a class="chapter-item" href="Social%20Studies/grassroots-democracy-part-3-local-government-in-urban-areas.html">Chapter 12: Grassroots Democracy — Part 3: Local Government in Urban Areas</a>
+<a class="chapter-item" href="Social%20Studies/the-value-of-work.html">Chapter 13: The Value of Work</a>
+<a class="chapter-item" href="Social%20Studies/economic-activities-around-us.html">Chapter 14: Economic Activities Around Us</a>
+</div></div>
 </div><!-- end #dashboard-page -->
-
-
 <script>
 /* ============================================================
    JAVASCRIPT — KALEIDO-6
@@ -1073,34 +1172,65 @@ backBtn.addEventListener('click', () => {
   landingPage.style.animation = 'portalOpen .9s cubic-bezier(.22,1,.36,1) both';
 });
 
-/* ---- 2. Dashboard — panel click → chapter expand ---- */
+/* ---- 2. Dashboard — subject click → chapters appear below all subject cards ---- */
 const panels = document.querySelectorAll('.subject-panel');
+const panelsWrap = document.querySelector('.panels-wrap');
+const selectedChaptersArea = document.getElementById('selected-chapters-area');
+const selectedChaptersTitle = document.getElementById('selected-chapters-title');
+let activeSubjectId = null;
+
+const subjectTitles = {
+  english: 'English Chapters',
+  science: 'Science Chapters',
+  math: 'Mathematics Chapters',
+  social: 'Social Studies Chapters'
+};
+
+function updateChapterArrow(panel) {
+  if (!panel || !selectedChaptersArea || !selectedChaptersArea.classList.contains('active')) return;
+  const panelRect = panel.getBoundingClientRect();
+  const areaRect = selectedChaptersArea.getBoundingClientRect();
+  const arrowLeft = panelRect.left + panelRect.width / 2 - areaRect.left;
+  selectedChaptersArea.style.setProperty('--arrow-left', arrowLeft + 'px');
+}
+
+function openSubjectChapters(panel) {
+  const id = panel.id.replace('panel-', '');
+  const list = document.getElementById('chapters-' + id);
+  if (!list) return;
+
+  activeSubjectId = id;
+  panelsWrap.classList.add('has-selection');
+  selectedChaptersArea.classList.remove('english-theme', 'science-theme', 'math-theme', 'social-theme');
+  selectedChaptersArea.classList.add('active', id + '-theme');
+  selectedChaptersTitle.textContent = subjectTitles[id] || 'Chapters';
+
+  document.querySelectorAll('.chapter-list').forEach(l => l.classList.remove('open'));
+  document.querySelectorAll('.subject-panel').forEach(p => p.classList.remove('selected-panel'));
+
+  panel.classList.add('selected-panel');
+  list.classList.add('open');
+
+  requestAnimationFrame(() => updateChapterArrow(panel));
+
+  // Re-trigger animations on chapter cards
+  list.querySelectorAll('.chapter-item').forEach((item, i) => {
+    item.style.animation = 'none';
+    item.offsetHeight; // reflow
+    item.style.animation = '';
+    item.style.animationDelay = (i * 0.05) + 's';
+  });
+}
 
 panels.forEach(panel => {
-  panel.addEventListener('click', () => {
-    const id   = panel.id.replace('panel-', '');
-    const list = document.getElementById('chapters-' + id);
-    if (!list) return;
-
-    const isOpen = list.classList.contains('open');
-
-    // Close all others
-    document.querySelectorAll('.chapter-list').forEach(l => l.classList.remove('open'));
-
-    // Toggle clicked one
-    if (!isOpen) {
-      list.classList.add('open');
-      // Re-trigger animations on chapter items
-      list.querySelectorAll('.chapter-item').forEach((item, i) => {
-        item.style.animation = 'none';
-        item.offsetHeight; // reflow
-        item.style.animation = '';
-        item.style.animationDelay = (i * 0.05) + 's';
-      });
-    }
-  });
+  panel.addEventListener('click', () => openSubjectChapters(panel));
 });
 
+window.addEventListener('resize', () => {
+  if (!activeSubjectId) return;
+  const panel = document.getElementById('panel-' + activeSubjectId);
+  updateChapterArrow(panel);
+});
 
 
 /* ---- 2B. Chapter links ----
